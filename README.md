@@ -21,6 +21,25 @@ The focus is methodological. It explains how spatial data was processed, transfo
 
 The README does not focus on archaeological interpretation, but on how the digital analytical product was built.
 
+## Coordinate Reference System (CRS)
+
+To ensure consistency and correct spatial analysis, this project must be used with the following Coordinate Reference System (CRS):
+
+**EPSG:32636 — WGS 84 / UTM zone 36N**
+
+All spatial layers, buffers, and calculations were created using this CRS. Using a different CRS may result in:
+
+- Incorrect distance and area calculations  
+- Misalignment between layers  
+- Inconsistent analysis results  
+
+Before starting work on the project, make sure that:
+
+- Your QGIS project is set to EPSG:32636  
+- All imported layers are reprojected to this CRS if necessary  
+
+This is especially important for buffer creation and area-based calculations, as the workflow relies on accurate metric units.
+
 ## Methodological Approach
 
 The workflow is based on an exposure model. It measures the proportion of modern land use surrounding archaeological locations rather than attempting to quantify direct physical destruction.
