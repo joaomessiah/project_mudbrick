@@ -31,144 +31,133 @@ All spatial layers, buffers, and calculations were created using this CRS. Using
 
 - Incorrect distance and area calculations  
 - Misalignment between layers  
-- Inconsistent analysis results  
+- Inconsistent analysis results
 
-Before starting work on the project, make sure that:
+## How to navigate the project
 
-- Your QGIS project is set to EPSG:32636  
-- All imported layers are reprojected to this CRS if necessary  
+If the goal is to open the GIS project: go to  
+GIS > Database > Workspace > Project_Mudbrick_Workspace.qgz  
+and open this file in QGIS.
 
-This is especially important for buffer creation and area-based calculations, as the workflow relies on accurate metric units.
+If the goal is to inspect the original raw data: go to  
+GIS > Database > Shapefiles > Original_OSM  
+or  
+GIS > Database > Shapefiles > Original_TN.
 
-## Methodological Approach
+If the goal is to inspect the final processed GIS layers: go to  
+GIS > Database > Shapefiles > Shp_Reclass_OSM  
+and  
+GIS > Database > Shapefiles > Shp_T&N.
 
-The workflow is based on an exposure model. It measures the proportion of modern land use surrounding archaeological locations rather than attempting to quantify direct physical destruction.
+If the goal is to inspect the buffer-based outputs: go to  
+GIS > Database > Shapefiles > Boundary_Radii.
 
-A buffer-based approach was used due to variable spatial precision in the archaeological dataset. Multiple radii (100 m, 250 m, 500 m) provide a more robust representation of site surroundings.
+If the goal is to use tabular results: go to  
+GIS > Database > Export_Excel  
+or  
+GIS > Database > Export_CSV.
 
-Three main disturbance domains were defined:
+## Recommended workflow for a new user
 
-* Urban
-* Infrastructure
-* Agriculture
+Open the main QGIS project from the Workspace folder.  
 
-## Data Sources
+Check the cleaned Tombs & Necropoleis layer in Shp_T&N.  
 
-* Tombs & Necropoleis dataset
-* OpenStreetMap (OSM) vector data
+Review the reclassified disturbance layers in Shp_Reclass_OSM.  
 
-## Project Structure
+Review the buffer outputs in Boundary_Radii.  
 
-The GIS project was organised to support iterative work and reproducibility:
+Use the Excel files in Export_Excel for the final analytical tables.  
 
-* QGIS workspace versions (V1–V6)
-* GeoPackage as main storage format
-* Structured folders for spatial data, Excel outputs, and documentation
 
-Core layers include TN points, land-use layers, infrastructure, buffers, and outputs.
+## Table Folder Structure
 
-## OpenStreetMap Reclassification
+| Folder | Function |
+|--------|----------|
+| Project_Mudbrick\GIS | Main working database folder containing spatial data, exports, and the QGIS workspace file |
+| GIS/Database/Shapefiles/Original_OSM | Original OpenStreetMap shapefiles downloaded before reclassification; archive of raw OSM input data |
+| GIS/Database/Shapefiles/Original_TN | Original Tombs & Necropoleis dataset before cleaning and restructuring; archive reference |
+| GIS/Database/Shapefiles/Shp_Reclass_OSM | Reclassified OSM-based layers used in the final disturbance model, including agriculture, archaeology, infrastructure, land use, and urban |
+| GIS/Database/Shapefiles/Shp_T&N | Cleaned and released Tombs & Necropoleis layer used in the GIS workflow |
+| GIS/Database/Shapefiles/Boundary_Radii | Analytical boundary outputs and derived layers for 100 m, 250 m, and 500 m analyses, including designation-wide and GISNo-merged outputs |
+| GIS/Database/Export_CSV | CSV exports of GIS attribute tables for checking, transfer, or lightweight spreadsheet use |
+| GIS/Database/Export_Excel | Main Excel outputs derived from the GIS workflow, including combined TN risk and final analysis workbooks |
+| GIS/Database/Workspace | Contains the QGIS project file; this is the main entry point for the spatial workspace |
+| GIS/Metadata_Discriptions | Folder for metadata notes, dataset descriptions, workflow structure, and supporting documentation |
+| GIS/Shortcuts | Alias/shortcut files pointing to the most important workspace and spreadsheet outputs for quick access |
 
-OSM data was simplified into:
 
-* Urban
-* Infrastructure
-* Agriculture
+## Data Processing, Cleaning, and Analysis
 
-Other classes (forest, water, scrub) were excluded from analysis.
+### 1. Source data collection
+The workflow started with the collection of the Tombs & Necropoleis dataset and the OpenStreetMap-based modern disturbance layers for Cyprus. The archaeological dataset provided the site records, while the OpenStreetMap layers provided the modern land-use and infrastructure information used to model present-day disturbance.
 
-## Spatial Preprocessing
+### 2. Data standardisation in QGIS
+All main layers were imported into QGIS and checked for geometry, attribute structure, and coordinate reference system. The archaeological layer was standardised so that the main identifiers, especially SerialNo and GISNo, could be used consistently in joins, exports, and later aggregation steps. All working layers were harmonised to EPSG:32636 (WGS 84 / UTM Zone 36N).
 
-* CRS harmonisation
-* Geometry and attribute consistency
-* Infrastructure converted from line to polygon
-* Visual validation in QGIS
+### 3. Reclassification of disturbance data
+The OpenStreetMap-derived layers were reclassified into three main disturbance categories: Urban, Infrastructure, and Agriculture. Non-built land-cover classes such as forest, scrub, and water were excluded.
 
-## GIS Processing Workflow
+### 4. Preparation of thematic layers
+Separate thematic layers were created for urban, agriculture, and infrastructure. Infrastructure data were converted from lines into polygons to allow area-based calculations.
 
-1. Prepare TN points with unique IDs
-2. Create buffers (100 m, 250 m, 500 m)
-3. Prepare land-use layers
-4. Intersect buffers with land-use
-5. Calculate class areas
-6. Convert to percentages
-7. Export to Excel
+### 5. Buffer generation
+Three buffer distances were created around each site: 100 m, 250 m, and 500 m. These buffers represent different spatial scales of disturbance.
 
-## Buffer Design
+### 6. Overlay and intersection
+Buffers were intersected with the disturbance layers using QGIS tools such as Intersection, Merge Vector Layers, and Join Attributes by Field/Value.
 
-* 100 m: immediate surroundings
-* 250 m: intermediate context
-* 500 m: broader landscape
+### 7. Area calculation
+The area of intersected polygons and total buffer areas were calculated in square metres using the Field Calculator.
 
-## Percentage Calculation
+### 8. Percentage measurement workflow
+Percentages were calculated using the formula:  
+percentage = (class area within buffer / total buffer area) × 100  
 
-% class = (class area / total buffer area) × 100
+This process was repeated for all buffers and sites. A residual category called not_classified was added to represent uncovered areas.
 
-## Additional Category
+### 9. Tabular export and Excel preparation
+Outputs were exported to CSV and Excel, preserving identifiers for further comparison.
 
-* not_classified: represents unclassified buffer area
+### 10. Merging duplicate location records
+Duplicate records were merged using GISNo to create a cleaner dataset for location-based analysis.
 
-## Excel Data Structure
+### 11. Data cleaning
+Data cleaning was performed in Excel. Sites classified as "clearly urban" and "strongly developed/semi-urbanized" were removed to reduce bias and focus on sites not yet heavily impacted by urbanisation.
 
-* Wide-format tables (one row per site)
-* Separate outputs per buffer
-* Merged site-level dataset
+### 12. Final digital outputs
+Final outputs include QGIS project files, shapefiles, GeoPackages, and Excel workbooks containing analytical results.
 
-Dataset reduced from 940 records to 312 cleaned sites.
 
-## Multi-Criteria Analysis
+## Risk Classification (Website)
 
-Weights:
+Risk classification was derived from the Multi-Criteria Analysis (MCA) points score calculated for each site.
 
-* Agriculture × 1
-* Infrastructure × 2
-* Urban × 3
-* Others × 0
+Percentages of disturbance types within buffers (100 m, 250 m, 500 m) were used as input.
 
-Points formula:
+Weights applied:
+- Agriculture = ×1  
+- Infrastructure = ×2  
+- Urban = ×3  
 
-Points = (Agri × 100 × 1) + (Infra × 100 × 2) + (Urban × 100 × 3)
+Formula:
+(Agriculture % × 100 × 1) + (Infrastructure % × 100 × 2) + (Urban % × 100 × 3)
 
-Max = 300 points
+The scores were averaged across the three buffer distances to reduce variability.
 
-## Data Cleaning
+Thresholds:
+- < 74 → Below Median Risk  
+- 74 – 99 → Above Median Risk  
+- > 99 → Strongly Above Median Risk  
 
-* Highly urban sites removed at 100 m
-* 127 sites excluded
-* Final dataset: 312 sites
+The median value (74) was used as the reference point.
 
-## Urbanisation Categories
+This classification allows:
+- Comparison between sites  
+- Identification of higher-risk locations  
+- Clear visualisation in maps and datasets  
 
-* > 60%: clearly urbanized
-* 40–60%: strongly developed
-* 20–40%: moderately developed
-* 10–20%: limited
-* < 10%: not urbanized
-
-## Risk Categories
-
-* < 74: below median
-* 74–99: above median
-* > 99: strongly above median
-
-## Key Findings
-
-* Most sites exposed to risk factors within 250 m and 500 m
-* Agriculture is the dominant factor by surface area
-* Sites mainly located in peri-urban zones
-* Limited chronological differences
-
-## Limitations
-
-* Spatial uncertainty (±100 m)
-* OSM data from 2016
-* No direct measurement of destruction
-* No preservation measures considered
-
-## Output
-
-* GIS layers (buffers, intersections)
-* Excel datasets (percentages, scores)
+Note: This classification reflects relative exposure to disturbance, not confirmed damage.
 
 The workflow is reproducible and suitable for further analysis and web visualisation.
 
