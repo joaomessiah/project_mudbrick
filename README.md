@@ -152,6 +152,9 @@ Thresholds:
 
 The median value (74) was used as the reference point.
 
+<img width="3507" height="2480" alt="Risk_Categories_map" src="https://github.com/user-attachments/assets/700c0afd-b4ef-433c-ab6c-5325ae501724" />
+
+
 This classification allows:
 - Comparison between sites  
 - Identification of higher-risk locations  
