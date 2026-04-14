@@ -164,3 +164,8 @@ Note: This classification reflects relative exposure to disturbance, not confirm
 
 The workflow is reproducible and suitable for further analysis and web visualisation.
 
+## License
+
+This project is licensed under the MIT License — you are free to use, modify, and distribute this software with proper attribution.
+
+
